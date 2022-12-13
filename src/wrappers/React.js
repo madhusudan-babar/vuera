@@ -1,5 +1,5 @@
 import React from 'react'
-import ReactDOM from 'react-dom'
+import { createRoot } from 'react-dom/client'
 import VueWrapper from './Vue'
 
 const makeReactContainer = Component => {
@@ -35,9 +35,7 @@ const makeReactContainer = Component => {
       const wrappedChildren = this.wrapVueChildren(children)
 
       return (
-        <Component {...rest}>
-          {children && <VueWrapper component={wrappedChildren} />}
-        </Component>
+        <Component {...rest}>{children && <VueWrapper component={wrappedChildren} />}</Component>
       )
     }
   }
@@ -48,19 +46,24 @@ export default {
   render (createElement) {
     return createElement('div', { ref: 'react' })
   },
+  data () {
+    return {
+      root: null,
+    }
+  },
   methods: {
     mountReactComponent (component) {
       const Component = makeReactContainer(component)
       const children = this.$slots.default !== undefined ? { children: this.$slots.default } : {}
-      ReactDOM.render(
+      this.root = createRoot(this.$refs.react)
+      this.root.render(
         <Component
           {...this.$props.passedProps}
           {...this.$attrs}
           {...this.$listeners}
           {...children}
           ref={ref => (this.reactComponentRef = ref)}
-        />,
-        this.$refs.react
+        />
       )
     },
   },
@@ -68,7 +71,7 @@ export default {
     this.mountReactComponent(this.$props.component)
   },
   beforeDestroy () {
-    ReactDOM.unmountComponentAtNode(this.$refs.react)
+    if (this.root) this.root.unmount()
   },
   updated () {
     /**

@@ -1,8 +1,7 @@
-var vuera = (function (exports,React,ReactDOM,Vue) {
+var vuera = (function (exports,React,client,Vue) {
 'use strict';
 
 React = React && React.hasOwnProperty('default') ? React['default'] : React;
-ReactDOM = ReactDOM && ReactDOM.hasOwnProperty('default') ? ReactDOM['default'] : ReactDOM;
 Vue = Vue && Vue.hasOwnProperty('default') ? Vue['default'] : Vue;
 
 var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) {
@@ -341,6 +340,11 @@ var ReactWrapper = {
   render: function render(createElement) {
     return createElement('div', { ref: 'react' });
   },
+  data: function data() {
+    return {
+      root: null
+    };
+  },
 
   methods: {
     mountReactComponent: function mountReactComponent(component) {
@@ -348,18 +352,19 @@ var ReactWrapper = {
 
       var Component = makeReactContainer(component);
       var children = this.$slots.default !== undefined ? { children: this.$slots.default } : {};
-      ReactDOM.render(React.createElement(Component, _extends({}, this.$props.passedProps, this.$attrs, this.$listeners, children, {
+      this.root = client.createRoot(this.$refs.react);
+      this.root.render(React.createElement(Component, _extends({}, this.$props.passedProps, this.$attrs, this.$listeners, children, {
         ref: function ref(_ref) {
           return _this2.reactComponentRef = _ref;
         }
-      })), this.$refs.react);
+      })));
     }
   },
   mounted: function mounted() {
     this.mountReactComponent(this.$props.component);
   },
   beforeDestroy: function beforeDestroy() {
-    ReactDOM.unmountComponentAtNode(this.$refs.react);
+    if (this.root) this.root.unmount();
   },
   updated: function updated() {
     /**
@@ -496,4 +501,4 @@ exports.config = config;
 
 return exports;
 
-}({},React,ReactDOM,Vue));
+}({},React,client,Vue));
