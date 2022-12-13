@@ -501,4 +501,4 @@ exports.config = config;
 
 return exports;
 
-}({},React,client,Vue));
+}({},React,ReactDOMClient,Vue));

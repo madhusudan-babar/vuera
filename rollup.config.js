@@ -38,7 +38,7 @@ export default [
       name: 'vuera',
       globals: {
         react: 'React',
-        'react-dom/client': 'client',
+        'react-dom/client': 'ReactDOMClient',
         vue: 'Vue',
       },
     },
